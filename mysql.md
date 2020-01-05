@@ -314,4 +314,173 @@ $ mysql -uroot -p
     ON DELETE NO ACTION 
     ```
 
-    
+#### 添加和删除数据列
+
+- 添加单列
+
+  ```mysql
+  ALTER TABLE tb_name ADD[COLUMN] col_name column_definition [FIRST | AFTER col_name]
+  -- 例子
+  CREATE DATABASE db_product;
+  USE db_product;
+  CREATE TABLE t1(
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(20) NOT NULL
+  );
+  SHOW COLUMNS FROM t1;
+  -- 在 id 和 name 之间添加一个age
+  ALTER TABLE t1 ADD age SMALLINT NOT NULL AFTER id;
+  SHOW COLUMNS FROM t1;
+  -- 添加一列并放在第一列
+  ALTER TABLE t1 ADD a INT FIRST;
+  ```
+
+- 添加多列
+
+  ```mysql
+  ALTER TABLE tb_name ADD [COlUMN] (col_name column_definition,...)
+  -- 例子
+  -- 往t1添加多列，添加多列是无法调整位置的，默认排最后
+  ALTER TABLE t1 ADD (salary FLOAT(8,2), number INT);
+  ```
+
+- 删除列
+
+  ```mysql
+  ALTER TABLE tb_name DROP [column] col_name
+  -- 例子
+  -- 删除t1的 a 列
+  ALTER TABLE t1 DROP a;
+  -- 删除t1的age和number
+  ALTER TABLE t1 DROP age, DROP number;
+  
+  ```
+
+#### 添加删除约束
+
+- 添加主键约束
+
+  ```mysql
+  ALTER TABLE tb_name ADD [约束名[唯一的名字]] PRIMARY KEY [index_type](index_col_name,...)
+  
+  -- 创建t2
+  CREATE TABLE t2(
+  id INT,
+  NAME VARCHAR(20),
+  age SMALLINT,
+  number INT
+  );
+  -- 添加主键约束
+  ALTER TABLE t2 ADD PRIMARY KEY (id);
+  SHOW COLUMNS FROM t2;
+  ```
+
+- 删除主键约束
+
+  ```mysql
+  AlTER TABLE tb_name DROP PRIMARY KEY;
+  -- 例子
+  -- 删除t2主键
+  ALTER TABLE t2 DROP PRIMARY KEY;
+  SHOW COLUMNS FROM t2;
+  ```
+
+- 添加唯一约束
+
+  ```mysql
+  -- 例子给t2的name添加唯一约束
+  ALTER TABLE t2 ADD UNIQUE KEY (name)
+  SHOW COLUMNS FROM t2;
+  ```
+
+- 删除唯一约束
+
+  ```mysql
+  -- 例子
+  ALTER TABLE t2 DROP KEY name;
+  SHOW COLUMNS FROM t2;
+  ```
+
+- 添加外键约束
+
+  ```mysql
+  -- 给t2的number列添加外键参照t1的id
+  ALTER TABLE t2 ADD FOREIGN KEY(number) REFERENCES t1(id);
+  SHOW COLUMNS FROM t2;
+  ```
+
+- 删除外键约束
+
+  ```mysql
+  -- 例子
+  -- 1. 现在查找t2外键的名字
+  SHOW CREATE TABLE t2;
+  /* 根据结果得到外键名字是t2_ibfk_1
+  CREATE TABLE `t2` ( `id` int(11) NOT NULL DEFAULT '0', `name` varchar(20) DEFAULT NULL, `age` smallint(6) DEFAULT NULL, `number` int(11) DEFAULT NULL, KEY `number` (`number`), CONSTRAINT `t2_ibfk_1` FOREIGN KEY (`number`) REFERENCES `t1` (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+  */
+  -- 删除外键
+  ALTER TABLE t2 DROP FOREIGN KEY t2_ibfk_1;
+  ```
+
+- 添加默认默认约束
+
+  ```mysql
+  -- 给t2的age设置默认值为18
+  ALTER TABLE t2 ALTER age SET DEFAULT 18;
+  SHOW COLUMNS FROM t2;
+  ```
+
+- 删除默认约束
+
+  ```mysql
+  -- 例子 删除t2age的默认值
+  ALTER TABLE t2 ALTER age DROP DEFAULT;
+  SHOW COLUMNS FROM t2;
+  ```
+
+#### 修改列定义/列名称
+
+- 修改列定义
+
+  ```mysql
+  ALTER TABLE tb_name MODIFY [COLUMN] col_name col_definition [FIRST | AFTER col_name]
+  -- 创建t3
+  create table t3(
+      id int not null,
+      name varchar(30),
+      number tinyint unsigned not null,
+      p_age int
+  );
+  show columns from t3;
+  -- 修改 p_age 列为 smallint unsigned(没符合，正数)并放在name下
+  ALTER TABLE t3 MODIFY p_age SMALLINT UNSIGNED NOT NULL AFTER NAME;
+  SHOW COLUMNS FROM t3;
+  ```
+
+  
+
+- 修改列名称
+
+```mysql
+ALTER TABLE tb_name CHANGE [COLUMN] old_col_name new_col_name colunm_definition [FIRST | AFTER col_name]
+-- 例子 把t3的number列修改为salary,float(8,2) 没符号位，放在name下
+ALTER TABLE t3 CHANGE number salary FLOAT(8,2) UNSIGNED NOT NULL AFTER NAME;
+SHOW COLUMNS FROM t3;
+```
+
+#### 修改数据表
+
+- 数据据表更名
+
+  ```mysql
+  -- 第一种
+  ALTER TABLE tb_name RENAME [TO|AS] new_table_name
+  -- 同时修改多表名
+  RENAME TABLE tb_name TO new_tb_name [,tb_name2 TO tb_new_name,...]
+  
+  -- 例子
+  ALTER TABLE t3 RENAME t4;
+  SHOW TABLES;
+  ```
+
+  
